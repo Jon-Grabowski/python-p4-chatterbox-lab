@@ -14,13 +14,14 @@ migrate = Migrate(app, db)
 
 db.init_app(app)
 
-@app.route('/messages')
-def messages():
-    return ''
 
-@app.route('/messages/<int:id>')
-def messages_by_id(id):
-    return ''
+# @app.route('/messages')
+# def messages():
+#     return ''
+
+# @app.route('/messages/<int:id>')
+# def messages_by_id(id):
+#     return ''
 
 if __name__ == '__main__':
     app.run(port=5555)
