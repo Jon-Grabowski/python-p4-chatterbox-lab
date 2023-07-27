@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, jsonify
+from flask import Flask, request, make_response, jsonify , request
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api , Resource 
@@ -34,6 +34,26 @@ class Messages(Resource):
         response = make_response(message_list, 200)
         return response
 
+    def post(self):
+        data = request.get_json()
+
+        message = Message(
+            body= data["body"],
+            username= data["username"] 
+        )
+        db.session.add(message)
+        db.session.commit()
+
+        response_dict ={
+            "id": message.id,
+            "body": message.body,
+            "username": message.username, 
+            "created_at": message.created_at,
+            "updated_at": message.updated_at
+        }
+        response = make_response(jsonify(response_dict) , 201)
+        return response
+
 api.add_resource(Messages, '/messages')
 
 @app.route('/messages/<int:id>')
@@ -41,4 +61,4 @@ def messages_by_id(id):
     return ''
 
 if __name__ == '__main__':
-    app.run(port=5555)
+    app.run(port=4000)
