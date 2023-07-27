@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api , Resource 
 from models import db, Message
+import ipdb
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -53,12 +54,39 @@ class Messages(Resource):
         }
         response = make_response(jsonify(response_dict) , 201)
         return response
-
 api.add_resource(Messages, '/messages')
 
-@app.route('/messages/<int:id>')
-def messages_by_id(id):
-    return ''
+
+class Messages_by_id(Resource):
+    def patch(self, id):
+        message = Message.query.filter(Message.id == id).first()
+        data = request.get_json()
+        for attr in data:
+            setattr(message, attr, data[attr])
+        
+        db.session.commit()
+
+        response_dict = message.to_dict()
+        response = make_response(response_dict, 200)
+        return response
+
+    def delete(self, id):
+        message = Message.query.filter(Message.id == id).first()
+        db.session.delete(message)
+        db.session.commit()
+        response_dict = {
+            "message": f'YASSS THIS GOT DELETED WITH {id}'
+        }
+        response= make_response(response_dict, 200)
+        return response
+    
+api.add_resource(Messages_by_id, '/messages/<int:id>')
+
+
+
+# @app.route('/messages/<int:id>')
+# def messages_by_id(id):
+#     return ''
 
 if __name__ == '__main__':
-    app.run(port=4000)
+    app.run(port=4000 , debug= True)
